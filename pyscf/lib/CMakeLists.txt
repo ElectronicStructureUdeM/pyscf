@@ -142,24 +142,18 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/deps/include/xc.h" AND
     set(LIBM "LIBS=-lm")
   endif()
   ExternalProject_Add(libxc
-    #GIT_REPOSITORY https://gitlab.com/libxc/libxc/
-    #GIT_TAG master
-    # Stick to libxc-3.0.1 because libxc-4.2.3 does not support M05X, M06X. They
-    # are defined in libxc-3.0.1 and agree very well to xcfun.
-    #URL http://www.tddft.org/programs/octopus/down.php?file=libxc/4.2.3/libxc-4.2.3.tar.gz
-    URL http://www.tddft.org/programs/octopus/down.php?file=libxc/3.0.1/libxc-3.0.1.tar.gz
-    #URL http://www.sunqm.net/pyscf/files/src/libxc-3.0.1.tar.gz
+    GIT_REPOSITORY https://gitlab.com/libxc/libxc
+		# This is the tag for libxc version 3.0.0
+    GIT_TAG e9c377e9
     PREFIX ${PROJECT_BINARY_DIR}/deps
     INSTALL_DIR ${PROJECT_SOURCE_DIR}/deps
     BUILD_IN_SOURCE 1
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --libdir=<INSTALL_DIR>/lib
-          --enable-shared --disable-static --disable-fortran ${LIBM}
+    CONFIGURE_COMMAND autoreconf -i || autoreconf && ./configure --prefix=<INSTALL_DIR> --libdir=<INSTALL_DIR>/lib
+          --enable-shared --disable-static --disable-fortran LIBS=-lm
           CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}
 
-## For git checkout
-#    CONFIGURE_COMMAND autoreconf -i || autoreconf && ./configure --prefix=<INSTALL_DIR> --libdir=<INSTALL_DIR>/lib
-#          --enable-shared --disable-static --disable-fortran LIBS=-lm
-#          CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER}
+# This is the line to compile the libxc version 4.3 using cmake.
+#		CONFIGURE_COMMAND cmake -H. -Bobjdir -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> && cd objdir && make -j8 && make install
   )
 endif() # ENABLE_LIBXC
 
